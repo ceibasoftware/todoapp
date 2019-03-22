@@ -1,0 +1,39 @@
+version: '3'
+services:
+  mysql:
+    restart: always
+    image: mysql
+    expose:
+      - "3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ceiba
+      MYSQL_DATABASE: ceiba
+      
+  backend:
+    restart: always
+    build: 
+      context: ./backend/
+    expose:
+      - "8080"
+    depends_on:
+      - mysql
+    links:
+      - mysql:mysql
+      
+  front:
+    restart: always
+    build: 
+      context: ./frontend/
+    expose:
+      - "80"
+      
+  nginx:
+    restart: always
+    image: nginx:latest
+    volumes:
+      - ./nginx-config/:/etc/nginx/
+    ports:
+      - 80:80
+    links:
+      - front:front
+      - backend:backend
